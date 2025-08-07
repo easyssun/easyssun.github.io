@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>자기소개 페이지</title>
+  <style>
+    :root {
+        --bg-color: #e0f7fa;           /* 하늘색 배경 */
+        --text-color: #333;
+        --card-bg: #ffffff;
+        --button-bg: #2196F3;          /* 파란색 버튼 */
+        --button-hover: #1976D2;       /* 버튼 hover 시 진한 파랑 */
+    }
+
+    body.dark {
+        --bg-color: #1e1e1e;
+        --text-color: #eeeeee;
+        --card-bg: #2c2c2c;
+        --button-bg: #64b5f6;          /* 다크모드용 밝은 파랑 */
+        --button-hover: #42a5f5;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .container {
+        text-align: center;
+        background-color: var(--card-bg);
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s;
+        /* max-width: 900px; ✅ 최대 너비 제한 (가로 길어짐) */
+        width: 80vw;      /* ✅ 화면 너비의 90% */
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 20px;
+      min-height: 42px;
+    }
+
+    p {
+      font-size: 20px;
+      margin: 8px 0;
+    }
+
+    .label {
+      font-weight: bold;
+    }
+
+    .profile-image {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-bottom: 20px;
+        border: 3px solid #ccc;
+        transition: transform 0.3s ease; /* ✅ 부드러운 확대 효과 */
+    }
+
+    .profile-image:hover {
+        transform: scale(1.3); /* ✅ 10% 확대 */
+        box-shadow: 0 0 15px 4px rgba(60, 201, 226, 0.839); /* 초록빛 glow 효과 */
+    }
+
+
+    .main-button {
+      width: 180px;
+      height: 50px;
+      margin: 8px 5px;
+      padding: 10px 0;
+      font-size: 16px;
+      background-color: var(--button-bg);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      display: inline-block;
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    .main-button:hover {
+      background-color: var(--button-hover);
+    }
+
+    #clock {
+      margin-top: 20px;
+      font-size: 16px;
+      color: var(--text-color);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="images.jpg" alt="프로필 이미지" class="profile-image">
+    <h1 id="greeting"></h1> <!-- 인사말은 자바스크립트로 출력됨 -->
+    <p><span class="label" id="hobby-label">취미:</span> <span id="hobby">클라이밍, 게임</span></p>
+    <p><span class="label" id="email-label">이메일:</span> <span id="email">easyssun@kspo.or.kr</span></p>
+
+    <button id="greet-button" class="main-button" onclick="sayHello()">인사하기</button>
+    <button id="lang-button" class="main-button" onclick="toggleLanguage()">English</button><br>
+    <button id="darkModeButton" class="main-button" onclick="toggleDarkMode()">🌙 다크모드</button>
+    <button id="lightModeButton" class="main-button" onclick="toggleLightMode()" style="display: none;">☀️ 라이트모드</button>
+
+    <p id="clock"></p> <!-- 현재 시각 표시 -->
+
+    <div style="margin-top: 30px;">
+        <h2 id="guestbook-title">📖 방명록</h2>
+        <textarea id="guestInput" rows="3" cols="40" placeholder="방명록을 남겨보세요!"></textarea><br>
+        <button id="guestSubmitButton" class="main-button" onclick="addGuestEntry()">남기기</button>
+        <ul id="guestbook" style="text-align: left; margin-top: 20px; padding-left: 0; list-style-type: none;"></ul>
+    </div>
+      
+  </div>
+
+  <script>
+    let currentLang = 'ko';
+    let typingInterval;
+    const greetingElement = document.getElementById("greeting");
+
+    const translations = {
+        ko: {
+            greeting: "안녕하세요! 이지해입니다.",
+            hobbyLabel: "취미:",
+            hobby: "클라이밍, 게임",
+            emailLabel: "이메일:",
+            email: "easyssun@kspo.or.kr",
+            greetButton: "인사하기",
+            langButton: "English",
+            darkmodeButton: "🌙 다크모드",
+            helloMessage: "안녕하세요! 반갑습니다 😊",
+            guestbookTitle: "📖 방명록",
+            guestPlaceholder: "방명록을 남겨보세요!",
+            guestSubmit: "남기기"
+        },
+        en: {
+            greeting: "Hello! I'm Jihae Lee.",
+            hobbyLabel: "Hobbies:",
+            hobby: "Climbing, Gaming",
+            emailLabel: "Email:",
+            email: "easyssun@kspo.or.kr",
+            greetButton: "Greet",
+            langButton: "한국어",
+            darkmodeButton: "🌙 Dark Mode",
+            helloMessage: "Hello! Nice to meet you 😊",
+            guestbookTitle: "📖 Guestbook",
+            guestPlaceholder: "Leave a message!",
+            guestSubmit: "Submit"
+        }
+    };
+
+
+    function typeGreeting(text) {
+        clearInterval(typingInterval);
+        greetingElement.textContent = "";
+        let index = 0;
+
+        typingInterval = setInterval(() => {
+            if (index < text.length) {
+            greetingElement.textContent += text.charAt(index);
+            index++;
+            } else {
+            clearInterval(typingInterval);
+            // 2초 쉬었다가 다시 시작
+            setTimeout(() => {
+                typeGreeting(text);
+            }, 2000);
+            }
+        }, 100);
+        }
+    // <button id="lang-button" class="main-button" onclick="toggleLanguage()">English</button><br>
+    // <button id="darkModeButton" class="main-button" onclick="toggleDarkMode()">🌙 다크모드</button>
+    // <button id="lightModeButton" class="main-button" onclick="toggleLightMode()" style="display: none;">☀️ 라이트모드</button>
+
+
+    function updateLanguage() {
+        const t = translations[currentLang];
+        typeGreeting(t.greeting);
+        document.getElementById("hobby-label").textContent = t.hobbyLabel;
+        document.getElementById("hobby").textContent = t.hobby;
+        document.getElementById("email-label").textContent = t.emailLabel;
+        document.getElementById("email").textContent = t.email;
+        document.getElementById("lang-button").textContent = t.langButton;
+        document.getElementById("darkModeButton").textContent = t.darkmodeButton;
+        document.getElementById("lightModeButton").textContent = t.darkmodeButton;
+        document.getElementById("greet-button").textContent = t.greetButton;
+        document.getElementById("guestbook-title").textContent = t.guestbookTitle;
+        document.getElementById("guestInput").placeholder = t.guestPlaceholder;
+        document.getElementById("guestSubmitButton").textContent = t.guestSubmit;
+    }
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'ko' ? 'en' : 'ko';
+      updateLanguage();
+    }
+
+    function sayHello() {
+      alert(translations[currentLang].helloMessage);
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.add('dark');
+      document.getElementById('darkModeButton').style.display = 'none';
+      document.getElementById('lightModeButton').style.display = 'inline-block';
+    }
+
+    function toggleLightMode() {
+      document.body.classList.remove('dark');
+      document.getElementById('lightModeButton').style.display = 'none';
+      document.getElementById('darkModeButton').style.display = 'inline-block';
+    }
+
+    function updateClock() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('ko-KR', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      document.getElementById("clock").textContent = `⏰ 현재 시각: ${timeStr}`;
+    }
+
+    // 초기 실행
+    updateLanguage();
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // 방명록 저장 및 표시
+    function addGuestEntry() {
+        const input = document.getElementById("guestInput");
+        const text = input.value.trim();
+        if (text === "") return;
+
+        const entry = { text, time: new Date().toLocaleString() };
+        const entries = JSON.parse(localStorage.getItem("guestbook")) || [];
+        entries.push(entry);
+        localStorage.setItem("guestbook", JSON.stringify(entries));
+        input.value = "";
+        displayGuestbook();
+    }
+
+    function displayGuestbook() {
+    const guestbook = document.getElementById("guestbook");
+    const entries = JSON.parse(localStorage.getItem("guestbook")) || [];
+
+    guestbook.innerHTML = entries
+        .map((entry, index) => `
+        <li style="margin-bottom: 10px;">
+            📝 ${entry.text}
+            <small style="color:gray;">(${entry.time})</small>
+            <button onclick="deleteGuestEntry(${entries.length - 1 - index})" style="margin-left:10px; background:none; border:none; color:red; font-weight:bold; cursor:pointer;">X</button>
+        </li>
+        `)
+        .reverse()
+        .join("");
+    }
+    function deleteGuestEntry(index) {
+        const entries = JSON.parse(localStorage.getItem("guestbook")) || [];
+        entries.splice(index, 1);
+        localStorage.setItem("guestbook", JSON.stringify(entries));
+        displayGuestbook();
+    }
+
+
+    // 초기 실행 시 방명록 표시
+    displayGuestbook();
+
+  </script>
+</body>
+</html>
